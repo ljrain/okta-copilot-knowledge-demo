@@ -1,10 +1,11 @@
 # Auth0 by Okta Copilot Knowledge Demo
 
-This is a small local demo site that uses the official Auth0 JavaScript SDK and shows protected knowledge content that can later be published for a Copilot agent.
+This is a small demo site that uses the official Auth0 JavaScript SDK and shows protected knowledge content that can later be published for a Copilot agent.
 
 ## What the demo does
 
 - Runs locally at `http://localhost:3000`.
+- Runs on GitHub Pages at `https://ljrain.github.io/okta-copilot-knowledge-demo/`.
 - Uses Auth0 OIDC sign-in through `@auth0/auth0-spa-js`.
 - Shows a searchable knowledge base after sign-in.
 - Keeps the Vite dev server pinned to port `3000` with `--strictPort` so Auth0 redirect URLs do not drift.
@@ -14,22 +15,25 @@ This is a small local demo site that uses the official Auth0 JavaScript SDK and 
 1. Sign in to your Auth0 dashboard.
 2. Go to **Applications** > **Applications**.
 3. Create or open a **Single Page Application**.
-4. Add this **Allowed Callback URL**:
+4. Add these **Allowed Callback URLs**:
 
    ```text
    http://localhost:3000/
+   https://ljrain.github.io/okta-copilot-knowledge-demo/
    ```
 
-5. Add this **Allowed Logout URL**:
+5. Add these **Allowed Logout URLs**:
 
    ```text
    http://localhost:3000/
+   https://ljrain.github.io/okta-copilot-knowledge-demo/
    ```
 
-6. Add this **Allowed Web Origin**:
+6. Add these **Allowed Web Origins**:
 
    ```text
    http://localhost:3000
+   https://ljrain.github.io
    ```
 
 7. Save the app and copy the **Domain** and **Client ID**.
@@ -62,6 +66,12 @@ Open:
 
 ```text
 http://localhost:3000
+```
+
+The app automatically uses the current page URL as its Auth0 callback and logout URL. For the GitHub Pages deployment, that URL is:
+
+```text
+https://ljrain.github.io/okta-copilot-knowledge-demo/
 ```
 
 ## Later Copilot connection

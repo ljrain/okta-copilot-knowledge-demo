@@ -6,7 +6,7 @@ const auth0Config = {
   domain: import.meta.env.VITE_AUTH0_DOMAIN,
   clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
   authorizationParams: {
-    redirect_uri: window.location.origin,
+    redirect_uri: getAppUrl(),
     scope: "openid profile email"
   }
 };
@@ -74,12 +74,12 @@ function render() {
             <li>Keep Auth0 in front of the app/API when the demo needs identity-based access.</li>
           </ol>
           <div class="code-card">
-            <span>Local demo URL</span>
-            <code>http://localhost:3000</code>
+            <span>Current demo URL</span>
+            <code>${escapeHtml(getAppUrl())}</code>
           </div>
           <div class="code-card">
             <span>Callback URL</span>
-            <code>http://localhost:3000/</code>
+            <code>${escapeHtml(getAppUrl())}</code>
           </div>
         </aside>
       </section>
@@ -119,9 +119,9 @@ function renderSetupPanel() {
       <h2>Configure your Auth0 application</h2>
       <ol class="steps">
         <li>Use the Auth0 Single Page Application you created.</li>
-        <li>Add Allowed Callback URL <code>http://localhost:3000/</code>.</li>
-        <li>Add Allowed Logout URL <code>http://localhost:3000/</code>.</li>
-        <li>Add Allowed Web Origin <code>http://localhost:3000</code>.</li>
+        <li>Add Allowed Callback URL <code>${escapeHtml(getAppUrl())}</code>.</li>
+        <li>Add Allowed Logout URL <code>${escapeHtml(getAppUrl())}</code>.</li>
+        <li>Add Allowed Web Origin <code>${escapeHtml(window.location.origin)}</code>.</li>
         <li>Copy <code>.env.example</code> to <code>.env</code> and paste your Auth0 domain and client ID.</li>
       </ol>
     </section>
@@ -173,7 +173,7 @@ function bindEvents() {
   document.querySelector("#logout-button")?.addEventListener("click", () => {
     auth0Client.logout({
       logoutParams: {
-        returnTo: window.location.origin
+        returnTo: getAppUrl()
       }
     });
   });
@@ -202,7 +202,7 @@ async function initializeAuth() {
 
     if (params.has("code") && params.has("state")) {
       await auth0Client.handleRedirectCallback();
-      window.history.replaceState({}, document.title, window.location.pathname);
+      window.history.replaceState({}, document.title, getAppUrl());
     }
 
     state.isAuthenticated = await auth0Client.isAuthenticated();
@@ -228,3 +228,7 @@ function escapeAttribute(value) {
 }
 
 initializeAuth();
+
+function getAppUrl() {
+  return window.location.href.split(/[?#]/)[0];
+}
