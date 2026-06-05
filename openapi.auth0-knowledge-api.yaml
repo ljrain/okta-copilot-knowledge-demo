@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: Auth0 Protected Knowledge API
+  version: 1.0.0
+  description: Search approved knowledge articles protected by Auth0 access tokens.
+servers:
+  - url: https://YOUR-PUBLISHED-API-HOST
+    description: Replace with the HTTPS URL where the API is hosted.
+paths:
+  /api/knowledge/search:
+    get:
+      operationId: searchKnowledge
+      summary: Search protected knowledge articles
+      description: Returns approved knowledge articles that match the provided search term.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search term, such as password, MFA, access, Copilot, or connector.
+      responses:
+        "200":
+          description: Matching knowledge articles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query:
+                    type: string
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/KnowledgeArticle"
+        "401":
+          description: Missing, invalid, or expired Auth0 access token.
+components:
+  securitySchemes:
+    Auth0OAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://YOUR_AUTH0_DOMAIN/authorize
+          tokenUrl: https://YOUR_AUTH0_DOMAIN/oauth/token
+          scopes:
+            openid: Sign in the user.
+            profile: Read basic profile information.
+            email: Read the user's email address.
+  schemas:
+    KnowledgeArticle:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        category:
+          type: string
+        audience:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+security:
+  - Auth0OAuth:
+      - openid
+      - profile
+      - email

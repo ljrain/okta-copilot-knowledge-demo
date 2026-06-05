@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+.DS_Store
+server.out.log
+server.err.log
+api.out.log
+api.err.log
