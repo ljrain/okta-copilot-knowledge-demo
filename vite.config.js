@@ -7,6 +7,7 @@ const projectRoot = realpathSync(dirname(fileURLToPath(import.meta.url)));
 
 export default defineConfig({
   root: projectRoot,
+  base: "/okta-copilot-knowledge-demo/",
   optimizeDeps: {
     include: [],
     noDiscovery: true
