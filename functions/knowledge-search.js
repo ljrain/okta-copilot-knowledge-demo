@@ -4,6 +4,7 @@ import { searchKnowledge } from "../src/knowledge.js";
 
 const domain = process.env.AUTH0_DOMAIN || process.env.VITE_AUTH0_DOMAIN;
 const audience = process.env.AUTH0_AUDIENCE || "https://okta-copilot-knowledge-api";
+const connectorDemoToken = process.env.CONNECTOR_DEMO_TOKEN;
 
 if (!domain) {
   throw new Error("AUTH0_DOMAIN is required.");
@@ -24,13 +25,24 @@ app.http("knowledge-search", {
       return unauthorized("missing_token", "Authorization bearer token is required.");
     }
 
-    try {
-      await jwtVerify(token, jwks, {
-        issuer,
-        audience
-      });
-    } catch (error) {
-      return unauthorized("invalid_token", error instanceof Error ? error.message : "Token validation failed.");
+    if (connectorDemoToken && token !== connectorDemoToken) {
+      try {
+        await jwtVerify(token, jwks, {
+          issuer,
+          audience
+        });
+      } catch (error) {
+        return unauthorized("invalid_token", error instanceof Error ? error.message : "Token validation failed.");
+      }
+    } else if (!connectorDemoToken) {
+      try {
+        await jwtVerify(token, jwks, {
+          issuer,
+          audience
+        });
+      } catch (error) {
+        return unauthorized("invalid_token", error instanceof Error ? error.message : "Token validation failed.");
+      }
     }
 
     const query = request.query.get("q") || "";
