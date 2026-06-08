@@ -77,6 +77,17 @@ export const knowledgeArticles = [
       "For a stronger identity demo, expose a search endpoint such as GET /api/knowledge/search?q=term and protect it with Auth0. Copilot Studio can call the endpoint through a custom connector or Power Automate flow. The connector should return concise JSON results with article title, summary, category, and content."
   },
   {
+    id: "auth0-copilot-studio-pattern",
+    title: "Using Auth0 with Copilot Studio",
+    summary:
+      "Copilot Studio should call protected Auth0 knowledge through a secured API action instead of crawling the login-protected website.",
+    category: "Integration",
+    audience: "Power Platform makers and identity administrators",
+    tags: ["auth0", "okta", "copilot studio", "custom connector", "protected api", "knowledge"],
+    content:
+      "Use Auth0 to protect the knowledge portal or API, then expose a search endpoint through an HTTPS API. In Copilot Studio, create a custom connector or Power Automate action that sends the user's question to the API and returns matching approved articles. Website knowledge is best for public crawlable pages and usually should not be used to crawl an Auth0 login page."
+  },
+  {
     id: "incident-escalation",
     title: "Incident escalation",
     summary:
@@ -107,18 +118,73 @@ export function searchKnowledge(query) {
     return knowledgeArticles;
   }
 
-  return knowledgeArticles.filter((article) => {
-    const searchableText = [
-      article.title,
-      article.summary,
-      article.category,
-      article.audience,
-      article.content,
-      ...article.tags
-    ]
-      .join(" ")
-      .toLowerCase();
+  const terms = normalizedQuery
+    .split(/[^a-z0-9]+/)
+    .filter((term) => term.length > 2 && !SEARCH_STOP_WORDS.has(term));
 
-    return searchableText.includes(normalizedQuery);
-  });
+  if (!terms.length) {
+    return knowledgeArticles;
+  }
+
+  return knowledgeArticles
+    .map((article) => {
+      const titleText = article.title.toLowerCase();
+      const tagText = article.tags.join(" ").toLowerCase();
+      const categoryText = article.category.toLowerCase();
+      const searchableText = [
+        article.title,
+        article.summary,
+        article.category,
+        article.audience,
+        article.content,
+        ...article.tags
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      const score = terms.reduce((total, term) => {
+        if (!searchableText.includes(term)) {
+          return total;
+        }
+
+        let termScore = 1;
+
+        if (titleText.includes(term)) {
+          termScore += 3;
+        }
+
+        if (tagText.includes(term)) {
+          termScore += 2;
+        }
+
+        if (categoryText.includes(term)) {
+          termScore += 1;
+        }
+
+        return total + termScore;
+      }, 0);
+
+      return { article, score };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((left, right) => right.score - left.score)
+    .map(({ article }) => article);
 }
+
+const SEARCH_STOP_WORDS = new Set([
+  "about",
+  "and",
+  "are",
+  "can",
+  "for",
+  "from",
+  "how",
+  "should",
+  "the",
+  "this",
+  "use",
+  "using",
+  "what",
+  "when",
+  "with"
+]);
