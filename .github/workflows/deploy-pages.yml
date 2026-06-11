@@ -27,8 +27,8 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          VITE_AUTH0_DOMAIN: dev-tbfw8qyfvlbbfixc.us.auth0.com
-          VITE_AUTH0_CLIENT_ID: aYrX2w4anjDNBwMDVgNkPrr7ASeDIJKF
+          VITE_AUTH0_DOMAIN: dev-au7a8gh2z4npnav4.us.auth0.com
+          VITE_AUTH0_CLIENT_ID: HOMYcKeggu64Q2nihIGzwwKdeguGW2da
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
